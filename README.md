@@ -1,59 +1,105 @@
-# AngularDashboard
+# 🚀 Angular Dashboard Pro
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+<div align="center">
 
-## Development server
+![Angular](https://img.shields.io/badge/Angular-21-DD0031?style=for-the-badge&logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![SCSS](https://img.shields.io/badge/SCSS-CC6699?style=for-the-badge&logo=sass&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-To start a local development server, run:
+Um dashboard administrativo moderno e responsivo construído com Angular 21, featuring tema escuro/claro, integração com API externa e componentes reutilizáveis.
+
+[Demo](#-demo) •
+[Funcionalidades](#-funcionalidades) •
+[Instalação](#-instalação) •
+[Tecnologias](#-tecnologias) •
+[Estrutura](#-estrutura-do-projeto)
+
+</div>
+
+---
+
+## 📸 Screenshots
+
+### 🌞 Tema Claro
+![Dashboard Light](https://via.placeholder.com/800x450/f8fafc/1e293b?text=Dashboard+Light+Mode)
+
+### 🌙 Tema Escuro
+![Dashboard Dark](https://via.placeholder.com/800x450/0f172a/f1f5f9?text=Dashboard+Dark+Mode)
+
+---
+
+## ✨ Funcionalidades
+
+### 🎨 Interface
+- ✅ **Tema Escuro/Claro** - Alternância suave com persistência no localStorage
+- ✅ **Design Responsivo** - Funciona em desktop, tablet e mobile
+- ✅ **Sidebar Retrátil** - Menu lateral com opção de colapsar
+- ✅ **Animações Suaves** - Transições CSS elegantes
+
+### 📊 Dashboard
+- ✅ **Cards de Estatísticas** - Métricas em tempo real
+- ✅ **Gráficos Interativos** - Visualização de dados
+- ✅ **Atividades Recentes** - Feed de atividades do sistema
+- ✅ **Tabela de Usuários** - Lista paginada com dados da API
+
+### 👥 Gestão de Usuários
+- ✅ **CRUD Completo** - Criar, ler, atualizar e excluir
+- ✅ **Busca e Filtros** - Pesquisa em tempo real
+- ✅ **Modal de Detalhes** - Visualização completa do usuário
+- ✅ **Validação de Formulários** - Feedback visual de erros
+
+### 📈 Relatórios
+- ✅ **Gráficos de Vendas** - Análise por período
+- ✅ **Métricas de Usuários** - Ativos vs Inativos
+- ✅ **Exportação** - Geração de relatórios
+
+### ⚙️ Configurações
+- ✅ **Perfil do Usuário** - Edição de dados pessoais
+- ✅ **Personalização** - Tema e preferências visuais
+- ✅ **Notificações** - Configuração de alertas
+- ✅ **Segurança** - Alteração de senha e 2FA
+
+---
+
+## 🛠 Tecnologias
+
+| Tecnologia | Versão | Descrição |
+|------------|--------|-----------|
+| **Angular** | 21.x | Framework principal |
+| **TypeScript** | 5.x | Linguagem de programação |
+| **SCSS** | - | Pré-processador CSS |
+| **RxJS** | 7.x | Programação reativa |
+| **Angular Router** | 21.x | Navegação SPA |
+| **HttpClient** | 21.x | Requisições HTTP |
+
+### 📦 APIs Utilizadas
+- [JSONPlaceholder](https://jsonplaceholder.typicode.com/) - API fake para demonstração
+
+---
+
+## 🚀 Instalação
+
+### Pré-requisitos
+
+- Node.js 18+ 
+- npm 9+ ou yarn
+- Angular CLI 21+
+
+### Passo a Passo
 
 ```bash
+# 1. Clone o repositório
+git clone https://github.com/SEU_USUARIO/angular-dashboard.git
+
+# 2. Entre na pasta
+cd angular-dashboard
+
+# 3. Instale as dependências
+npm install
+
+# 4. Rode o projeto
 ng serve
-```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+# 5. Acesse no navegador
+http://localhost:4200
