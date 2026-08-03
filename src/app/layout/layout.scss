@@ -1,0 +1,35 @@
+.shell {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.shell__body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+  transition: margin-left var(--transition-base);
+}
+
+.shell--collapsed .shell__body {
+  margin-left: var(--sidebar-width-collapsed);
+}
+
+.shell__content {
+  flex: 1;
+  padding: 24px;
+}
+
+.shell__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(8, 12, 20, 0.5);
+  animation: fadeInUp 150ms ease both;
+}
+
+@media (max-width: 900px) {
+  .shell__body {
+    margin-left: 0 !important;
+  }
+}

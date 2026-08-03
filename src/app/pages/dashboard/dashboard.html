@@ -1,0 +1,59 @@
+<div class="dashboard">
+  <div class="dashboard__header">
+    <h1>Dashboard</h1>
+    <p class="dashboard__subtitle">Visão geral do seu painel administrativo</p>
+  </div>
+
+  <section class="stat-grid">
+    @if (loading()) {
+      @for (row of skeletonRows; track row) {
+        <div class="stat-card">
+          <app-skeleton variant="circle" width="40px" height="40px"></app-skeleton>
+          <app-skeleton width="70%" height="12px"></app-skeleton>
+          <app-skeleton width="50%" height="22px"></app-skeleton>
+        </div>
+      }
+    } @else {
+      @for (stat of stats; track stat.label) {
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            <app-icon [name]="stat.icon" [size]="20"></app-icon>
+          </div>
+          <p class="stat-card__label">{{ stat.label }}</p>
+          <div class="stat-card__row">
+            <span class="stat-card__value">{{ stat.value }}</span>
+            <span class="stat-card__delta" [class.stat-card__delta--down]="stat.trend === 'down'">
+              {{ stat.delta }}
+            </span>
+          </div>
+        </div>
+      }
+    }
+  </section>
+
+  <section class="panel">
+    <h2>Atividades recentes</h2>
+    <ul class="activity-list">
+      @if (loading()) {
+        @for (row of skeletonRows; track row) {
+          <li class="activity-item">
+            <app-skeleton variant="circle" width="32px" height="32px"></app-skeleton>
+            <app-skeleton width="60%" height="12px"></app-skeleton>
+          </li>
+        }
+      } @else {
+        @for (item of activities; track item.title) {
+          <li class="activity-item">
+            <span class="activity-item__icon">
+              <app-icon [name]="item.icon" [size]="16"></app-icon>
+            </span>
+            <div class="activity-item__body">
+              <p>{{ item.title }}</p>
+              <span class="activity-item__time">{{ item.time }}</span>
+            </div>
+          </li>
+        }
+      }
+    </ul>
+  </section>
+</div>

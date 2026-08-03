@@ -1,0 +1,31 @@
+<aside
+  class="sidebar"
+  [class.sidebar--collapsed]="collapsed"
+  [class.sidebar--mobile-open]="mobileOpen"
+>
+  <div class="sidebar__brand">
+    <span class="sidebar__logo">DP</span>
+    @if (!collapsed) {
+      <span class="sidebar__brand-name">Dashboard Pro</span>
+    }
+  </div>
+
+  <nav class="sidebar__nav">
+    @for (item of navItems; track item.route) {
+      <a
+        class="sidebar__link"
+        [routerLink]="item.route"
+        routerLinkActive="sidebar__link--active"
+        [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+        [title]="collapsed ? item.label : null"
+        (click)="closeMobile.emit()"
+      >
+        <span class="sidebar__rail"></span>
+        <app-icon [name]="item.icon" [size]="20"></app-icon>
+        @if (!collapsed) {
+          <span class="sidebar__label">{{ item.label }}</span>
+        }
+      </a>
+    }
+  </nav>
+</aside>

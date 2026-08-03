@@ -1,0 +1,15 @@
+<div class="placeholder">
+  <h1>{{ title }}</h1>
+
+  @if (loading()) {
+    <div class="placeholder__skeleton">
+      <app-skeleton height="14px" width="40%"></app-skeleton>
+      <app-skeleton height="110px" width="100%"></app-skeleton>
+      <app-skeleton height="110px" width="100%"></app-skeleton>
+    </div>
+  } @else {
+    <p class="placeholder__message">
+      Esta seção ainda está em construção. Em breve você poderá gerenciar essa área por aqui.
+    </p>
+  }
+</div>

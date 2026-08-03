@@ -1,0 +1,44 @@
+<header class="header">
+  <div class="header__left">
+    <button
+      class="icon-btn icon-btn--desktop"
+      type="button"
+      (click)="toggleCollapse.emit()"
+      [attr.aria-label]="collapsed ? 'Expandir menu' : 'Recolher menu'"
+    >
+      <app-icon [name]="collapsed ? 'chevron-right' : 'chevron-left'" [size]="18"></app-icon>
+    </button>
+
+    <button
+      class="icon-btn icon-btn--mobile"
+      type="button"
+      (click)="toggleMobile.emit()"
+      aria-label="Abrir menu"
+    >
+      <app-icon name="menu" [size]="20"></app-icon>
+    </button>
+
+    <label class="header__search">
+      <app-icon name="search" [size]="16"></app-icon>
+      <input type="text" placeholder="Buscar..." />
+    </label>
+  </div>
+
+  <div class="header__right">
+    <button class="icon-btn" type="button" aria-label="Notificações">
+      <app-icon name="bell" [size]="19"></app-icon>
+      <span class="header__badge"></span>
+    </button>
+
+    <button
+      class="icon-btn theme-toggle"
+      type="button"
+      (click)="theme.toggle()"
+      [attr.aria-label]="theme.theme() === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'"
+    >
+      <app-icon [name]="theme.theme() === 'dark' ? 'sun' : 'moon'" [size]="19"></app-icon>
+    </button>
+
+    <div class="header__avatar" aria-hidden="true">HD</div>
+  </div>
+</header>

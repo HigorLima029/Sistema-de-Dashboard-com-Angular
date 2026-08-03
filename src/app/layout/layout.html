@@ -1,0 +1,23 @@
+<div class="shell" [class.shell--collapsed]="collapsed()">
+  <app-sidebar
+    [collapsed]="collapsed()"
+    [mobileOpen]="mobileOpen()"
+    (closeMobile)="mobileOpen.set(false)"
+  ></app-sidebar>
+
+  @if (mobileOpen()) {
+    <div class="shell__scrim" (click)="mobileOpen.set(false)"></div>
+  }
+
+  <div class="shell__body">
+    <app-header
+      [collapsed]="collapsed()"
+      (toggleCollapse)="collapsed.set(!collapsed())"
+      (toggleMobile)="mobileOpen.set(!mobileOpen())"
+    ></app-header>
+
+    <main class="shell__content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
