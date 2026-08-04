@@ -1,0 +1,85 @@
+<div class="produtos">
+  <div class="produtos__header">
+    <h1>Produtos</h1>
+    <p class="produtos__subtitle">Catálogo real (Fake Store API) com controle de estoque local</p>
+  </div>
+
+  <div class="produtos__toolbar">
+    <label class="produtos__search">
+      <app-icon name="search" [size]="16"></app-icon>
+      <input
+        type="text"
+        placeholder="Buscar produto..."
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+      />
+    </label>
+
+    <select class="produtos__filter" [ngModel]="selectedCategory()" (ngModelChange)="selectedCategory.set($event)">
+      @for (category of categories(); track category) {
+        <option [value]="category">{{ category }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="produtos__table">
+    <div class="produtos__row produtos__row--head">
+      <span>Produto</span>
+      <span>Categoria</span>
+      <span>Preço</span>
+      <span>Estoque</span>
+      <span>Movimentar</span>
+    </div>
+
+    @if (loading()) {
+      @for (row of skeletonRows; track row) {
+        <div class="produtos__row">
+          <div class="produtos__product">
+            <app-skeleton variant="circle" width="36px" height="36px"></app-skeleton>
+            <app-skeleton width="140px" height="12px"></app-skeleton>
+          </div>
+          <app-skeleton width="80px" height="12px"></app-skeleton>
+          <app-skeleton width="60px" height="12px"></app-skeleton>
+          <app-skeleton width="50px" height="12px"></app-skeleton>
+          <app-skeleton width="100px" height="12px"></app-skeleton>
+        </div>
+      }
+    } @else {
+      @for (product of filteredProducts(); track product.id) {
+        <div class="produtos__row">
+          <div class="produtos__product">
+            <img [src]="product.image" [alt]="product.title" />
+            <span [title]="product.title">{{ product.title }}</span>
+          </div>
+          <span class="produtos__category">{{ product.category }}</span>
+          <span class="produtos__price">{{ product.price | number: '1.2-2' }}</span>
+          <span class="produtos__stock" [class.produtos__stock--low]="isLowStock(product.id)">
+            {{ stock.quantityFor(product.id) }}
+            @if (isLowStock(product.id)) {
+              <span class="produtos__badge">baixo</span>
+            }
+          </span>
+          <div class="produtos__actions">
+            <input
+              class="produtos__step"
+              type="number"
+              min="1"
+              [ngModel]="stepFor(product.id)"
+              (ngModelChange)="setStep(product.id, $event)"
+            />
+            <button type="button" class="produtos__btn produtos__btn--in" (click)="registrar(product, 'entrada')">
+              + Entrada
+            </button>
+            <button type="button" class="produtos__btn produtos__btn--out" (click)="registrar(product, 'saida')">
+              - Saída
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (filteredProducts().length === 0) {
+        <div class="produtos__empty">Nenhum produto encontrado para esse filtro.</div>
+      }
+    }
+  </div>
+</div>

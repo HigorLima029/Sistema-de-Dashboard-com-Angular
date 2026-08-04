@@ -39,6 +39,10 @@
       <app-icon [name]="theme.theme() === 'dark' ? 'sun' : 'moon'" [size]="19"></app-icon>
     </button>
 
-    <div class="header__avatar" aria-hidden="true">HD</div>
+    <div class="header__avatar" [title]="auth.currentUser()?.name" aria-hidden="true">{{ initials() }}</div>
+
+    <button class="icon-btn" type="button" (click)="logout()" aria-label="Sair">
+      <app-icon name="logout" [size]="18"></app-icon>
+    </button>
   </div>
 </header>

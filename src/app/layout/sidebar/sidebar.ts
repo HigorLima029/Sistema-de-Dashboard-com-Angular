@@ -23,7 +23,7 @@ export class SidebarComponent {
 
   readonly navItems: NavItem[] = [
     { icon: 'dashboard', label: 'Dashboard', route: '/' },
-    { icon: 'users', label: 'Usuários', route: '/usuarios' },
+    { icon: 'folder', label: 'Produtos', route: '/produtos' },
     { icon: 'chart', label: 'Relatórios', route: '/relatorios' },
     { icon: 'settings', label: 'Configurações', route: '/configuracoes' },
   ];

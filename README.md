@@ -90,7 +90,7 @@ Um dashboard administrativo moderno e responsivo construído com Angular 21, fea
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/HigorLima029/Sistema-de-Dashboard-com-Angular.git
+git clone https://github.com/SEU_USUARIO/angular-dashboard.git
 
 # 2. Entre na pasta
 cd angular-dashboard

@@ -1,7 +1,9 @@
 <div class="dashboard">
   <div class="dashboard__header">
-    <h1>Dashboard</h1>
-    <p class="dashboard__subtitle">Visão geral do seu painel administrativo</p>
+    <h1>Olá, {{ auth.currentUser()?.name }} 👋</h1>
+    <p class="dashboard__subtitle">
+      {{ auth.currentUser()?.role }} · visão geral do estoque em tempo real
+    </p>
   </div>
 
   <section class="stat-grid">
@@ -14,46 +16,77 @@
         </div>
       }
     } @else {
-      @for (stat of stats; track stat.label) {
+      @for (stat of stats(); track stat.label) {
         <div class="stat-card">
           <div class="stat-card__icon">
             <app-icon [name]="stat.icon" [size]="20"></app-icon>
           </div>
           <p class="stat-card__label">{{ stat.label }}</p>
-          <div class="stat-card__row">
-            <span class="stat-card__value">{{ stat.value }}</span>
-            <span class="stat-card__delta" [class.stat-card__delta--down]="stat.trend === 'down'">
-              {{ stat.delta }}
-            </span>
-          </div>
+          <span class="stat-card__value">{{ stat.value }}</span>
         </div>
       }
     }
   </section>
 
-  <section class="panel">
-    <h2>Atividades recentes</h2>
-    <ul class="activity-list">
-      @if (loading()) {
-        @for (row of skeletonRows; track row) {
-          <li class="activity-item">
-            <app-skeleton variant="circle" width="32px" height="32px"></app-skeleton>
-            <app-skeleton width="60%" height="12px"></app-skeleton>
-          </li>
+  @if (!loading()) {
+    <section class="chart-grid">
+      <div class="panel">
+        <h2>Itens em estoque por categoria</h2>
+        <app-chart type="bar" [labels]="categoryLabels()" [data]="categoryQuantities()" label="Unidades"></app-chart>
+      </div>
+
+      <div class="panel">
+        <h2>Valor em estoque por categoria</h2>
+        <app-chart type="doughnut" [labels]="categoryLabels()" [data]="categoryValues()" label="R$"></app-chart>
+      </div>
+    </section>
+
+    <section class="lower-grid">
+      <div class="panel">
+        <h2>Atividade recente</h2>
+        @if (recentMovements().length === 0) {
+          <p class="empty-hint">Nenhuma movimentação registrada ainda. Acesse "Produtos" para lançar entradas e saídas.</p>
+        } @else {
+          <ul class="activity-list">
+            @for (item of recentMovements(); track item.id) {
+              <li class="activity-item">
+                <span
+                  class="activity-item__icon"
+                  [class.activity-item__icon--out]="item.type === 'saida'"
+                >
+                  <app-icon [name]="item.type === 'entrada' ? 'chart' : 'bell'" [size]="16"></app-icon>
+                </span>
+                <div class="activity-item__body">
+                  <p>
+                    {{ item.type === 'entrada' ? 'Entrada' : 'Saída' }} de {{ item.quantity }} un. —
+                    {{ item.productTitle }}
+                  </p>
+                  <span class="activity-item__time">{{ item.date | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </li>
+            }
+          </ul>
         }
-      } @else {
-        @for (item of activities; track item.title) {
-          <li class="activity-item">
-            <span class="activity-item__icon">
-              <app-icon [name]="item.icon" [size]="16"></app-icon>
-            </span>
-            <div class="activity-item__body">
-              <p>{{ item.title }}</p>
-              <span class="activity-item__time">{{ item.time }}</span>
-            </div>
-          </li>
+      </div>
+
+      <div class="panel">
+        <h2>Sua categoria: {{ auth.currentUser()?.preferredCategory }}</h2>
+        @if (preferredCategoryProducts().length === 0) {
+          <p class="empty-hint">Nenhum produto encontrado nessa categoria.</p>
+        } @else {
+          <ul class="preferred-list">
+            @for (product of preferredCategoryProducts(); track product.id) {
+              <li class="preferred-item">
+                <img [src]="product.image" [alt]="product.title" />
+                <div class="preferred-item__body">
+                  <p [title]="product.title">{{ product.title }}</p>
+                  <span>{{ stock.quantityFor(product.id) }} un. em estoque</span>
+                </div>
+              </li>
+            }
+          </ul>
         }
-      }
-    </ul>
-  </section>
+      </div>
+    </section>
+  }
 </div>

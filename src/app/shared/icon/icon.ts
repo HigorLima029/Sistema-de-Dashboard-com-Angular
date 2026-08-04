@@ -13,7 +13,8 @@ export type IconName =
   | 'settings'
   | 'bell'
   | 'search'
-  | 'folder';
+  | 'folder'
+  | 'logout';
 
 @Component({
   selector: 'app-icon',

@@ -1,0 +1,44 @@
+<div class="login">
+  <button
+    class="login__theme-toggle"
+    type="button"
+    (click)="themeService.toggle()"
+    [attr.aria-label]="themeService.theme() === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'"
+  >
+    <app-icon [name]="themeService.theme() === 'dark' ? 'sun' : 'moon'" [size]="18"></app-icon>
+  </button>
+
+  <form class="login__card" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="login__brand">
+      <span class="login__logo">DP</span>
+      <span>Dashboard Pro</span>
+    </div>
+
+    <h1>Entrar</h1>
+    <p class="login__subtitle">Acesse o painel de controle de estoque</p>
+
+    <label class="field">
+      <span>Usuário</span>
+      <input type="text" formControlName="username" autocomplete="username" placeholder="admin" />
+    </label>
+
+    <label class="field">
+      <span>Senha</span>
+      <input type="password" formControlName="password" autocomplete="current-password" placeholder="••••••••" />
+    </label>
+
+    @if (error()) {
+      <p class="login__error">Usuário ou senha inválidos.</p>
+    }
+
+    <button class="login__submit" type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Entrando...' : 'Entrar' }}
+    </button>
+
+    <div class="login__demo">
+      <span>Contas de demonstração:</span>
+      <button type="button" (click)="preencherDemo('admin', 'admin123')">admin / admin123</button>
+      <button type="button" (click)="preencherDemo('higor', '123456')">higor / 123456</button>
+    </div>
+  </form>
+</div>
