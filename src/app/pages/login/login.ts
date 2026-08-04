@@ -3,12 +3,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { IconComponent } from '../../shared/icon/icon';
+import { LoadingComponent } from '../../shared/loading/loading';
 import { ThemeService } from '../../core/theme.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent],
+  imports: [ReactiveFormsModule, IconComponent, LoadingComponent],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })

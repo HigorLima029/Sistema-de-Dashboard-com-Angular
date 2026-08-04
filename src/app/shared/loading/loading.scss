@@ -1,0 +1,36 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+}
+
+.loading--inline {
+  flex-direction: row;
+  padding: 0;
+  gap: 8px;
+}
+
+.loading--fullscreen {
+  min-height: 200px;
+}
+
+.loading__spinner {
+  display: inline-block;
+  border-radius: 50%;
+  border: 2.5px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+  border-top-color: var(--color-accent);
+  animation: spin 700ms linear infinite;
+}
+
+.loading__label {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}

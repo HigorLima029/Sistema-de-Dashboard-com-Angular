@@ -22,64 +22,95 @@
     </select>
   </div>
 
-  <div class="produtos__table">
-    <div class="produtos__row produtos__row--head">
-      <span>Produto</span>
-      <span>Categoria</span>
-      <span>Preço</span>
-      <span>Estoque</span>
-      <span>Movimentar</span>
-    </div>
+  <app-table
+    [columns]="['Produto', 'Categoria', 'Preço', 'Estoque', 'Movimentar']"
+    gridTemplate="2fr 1fr 0.8fr 1fr 1.6fr"
+    [items]="filteredProducts()"
+    [loading]="loading()"
+    emptyMessage="Nenhum produto encontrado para esse filtro."
+  >
+    <ng-template #rowTemplate let-product>
+      <button type="button" class="produtos__product" (click)="abrirDetalhes(product)">
+        <img [src]="product.image" [alt]="product.title" />
+        <span [title]="product.title">{{ product.title }}</span>
+      </button>
+      <span class="produtos__category">{{ product.category }}</span>
+      <span class="produtos__price">{{ product.price | number: '1.2-2' }}</span>
+      <span class="produtos__stock" [class.produtos__stock--low]="isLowStock(product.id)">
+        {{ stock.quantityFor(product.id) }}
+        @if (isLowStock(product.id)) {
+          <span class="produtos__badge">baixo</span>
+        }
+      </span>
+      <div class="produtos__actions">
+        <input
+          class="produtos__step"
+          type="number"
+          min="1"
+          [ngModel]="stepFor(product.id)"
+          (ngModelChange)="setStep(product.id, $event)"
+        />
+        <button type="button" class="produtos__btn produtos__btn--in" (click)="registrar(product, 'entrada')">
+          + Entrada
+        </button>
+        <button type="button" class="produtos__btn produtos__btn--out" (click)="registrar(product, 'saida')">
+          - Saída
+        </button>
+      </div>
+    </ng-template>
 
-    @if (loading()) {
-      @for (row of skeletonRows; track row) {
-        <div class="produtos__row">
-          <div class="produtos__product">
-            <app-skeleton variant="circle" width="36px" height="36px"></app-skeleton>
-            <app-skeleton width="140px" height="12px"></app-skeleton>
-          </div>
-          <app-skeleton width="80px" height="12px"></app-skeleton>
-          <app-skeleton width="60px" height="12px"></app-skeleton>
-          <app-skeleton width="50px" height="12px"></app-skeleton>
-          <app-skeleton width="100px" height="12px"></app-skeleton>
-        </div>
-      }
-    } @else {
-      @for (product of filteredProducts(); track product.id) {
-        <div class="produtos__row">
-          <div class="produtos__product">
-            <img [src]="product.image" [alt]="product.title" />
-            <span [title]="product.title">{{ product.title }}</span>
-          </div>
-          <span class="produtos__category">{{ product.category }}</span>
-          <span class="produtos__price">{{ product.price | number: '1.2-2' }}</span>
-          <span class="produtos__stock" [class.produtos__stock--low]="isLowStock(product.id)">
-            {{ stock.quantityFor(product.id) }}
-            @if (isLowStock(product.id)) {
-              <span class="produtos__badge">baixo</span>
-            }
-          </span>
-          <div class="produtos__actions">
-            <input
-              class="produtos__step"
-              type="number"
-              min="1"
-              [ngModel]="stepFor(product.id)"
-              (ngModelChange)="setStep(product.id, $event)"
-            />
-            <button type="button" class="produtos__btn produtos__btn--in" (click)="registrar(product, 'entrada')">
-              + Entrada
-            </button>
-            <button type="button" class="produtos__btn produtos__btn--out" (click)="registrar(product, 'saida')">
-              - Saída
-            </button>
-          </div>
-        </div>
-      }
-
-      @if (filteredProducts().length === 0) {
-        <div class="produtos__empty">Nenhum produto encontrado para esse filtro.</div>
-      }
-    }
-  </div>
+    <ng-template #skeletonRowTemplate>
+      <div class="produtos__product">
+        <app-skeleton variant="circle" width="36px" height="36px"></app-skeleton>
+        <app-skeleton width="140px" height="12px"></app-skeleton>
+      </div>
+      <app-skeleton width="80px" height="12px"></app-skeleton>
+      <app-skeleton width="60px" height="12px"></app-skeleton>
+      <app-skeleton width="50px" height="12px"></app-skeleton>
+      <app-skeleton width="100px" height="12px"></app-skeleton>
+    </ng-template>
+  </app-table>
 </div>
+
+<app-modal
+  [open]="selectedProduct() !== null"
+  [title]="selectedProduct()?.title ?? ''"
+  (closed)="fecharDetalhes()"
+>
+  @if (selectedProduct(); as product) {
+    <div class="produto-detalhe">
+      <img [src]="product.image" [alt]="product.title" />
+
+      <p class="produto-detalhe__categoria">{{ product.category }}</p>
+      <p class="produto-detalhe__descricao">{{ product.description }}</p>
+
+      <div class="produto-detalhe__linha">
+        <span>Preço</span>
+        <strong>{{ product.price | number: '1.2-2' }}</strong>
+      </div>
+
+      <div class="produto-detalhe__linha">
+        <span>Em estoque</span>
+        <strong [class.produtos__stock--low]="isLowStock(product.id)">
+          {{ stock.quantityFor(product.id) }} un.
+        </strong>
+      </div>
+
+      <div class="produto-detalhe__acoes">
+        <input
+          class="produtos__step"
+          type="number"
+          min="1"
+          [ngModel]="stepFor(product.id)"
+          (ngModelChange)="setStep(product.id, $event)"
+        />
+        <button type="button" class="produtos__btn produtos__btn--in" (click)="registrar(product, 'entrada')">
+          + Entrada
+        </button>
+        <button type="button" class="produtos__btn produtos__btn--out" (click)="registrar(product, 'saida')">
+          - Saída
+        </button>
+      </div>
+    </div>
+  }
+</app-modal>

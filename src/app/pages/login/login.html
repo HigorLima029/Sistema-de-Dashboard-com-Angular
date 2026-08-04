@@ -32,7 +32,11 @@
     }
 
     <button class="login__submit" type="submit" [disabled]="submitting()">
-      {{ submitting() ? 'Entrando...' : 'Entrar' }}
+      @if (submitting()) {
+        <app-loading [inline]="true" [size]="14" color="#ffffff" label="Entrando..."></app-loading>
+      } @else {
+        Entrar
+      }
     </button>
 
     <div class="login__demo">

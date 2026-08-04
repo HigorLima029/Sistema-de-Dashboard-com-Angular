@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { AuthService } from '../../core/auth.service';
 import { Product, ProductsService } from '../../core/products.service';
 import { StockService } from '../../core/stock.service';
+import { CardComponent } from '../../shared/card/card';
 import { ChartComponent } from '../../shared/chart/chart';
 import { IconComponent, IconName } from '../../shared/icon/icon';
 import { SkeletonComponent } from '../../shared/skeleton/skeleton';
@@ -16,7 +17,7 @@ interface StatCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [DatePipe, IconComponent, SkeletonComponent, ChartComponent],
+  imports: [DatePipe, IconComponent, SkeletonComponent, ChartComponent, CardComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

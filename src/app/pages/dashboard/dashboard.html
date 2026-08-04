@@ -9,7 +9,7 @@
   <section class="stat-grid">
     @if (loading()) {
       @for (row of skeletonRows; track row) {
-        <div class="stat-card">
+        <div class="stat-skeleton">
           <app-skeleton variant="circle" width="40px" height="40px"></app-skeleton>
           <app-skeleton width="70%" height="12px"></app-skeleton>
           <app-skeleton width="50%" height="22px"></app-skeleton>
@@ -17,33 +17,24 @@
       }
     } @else {
       @for (stat of stats(); track stat.label) {
-        <div class="stat-card">
-          <div class="stat-card__icon">
-            <app-icon [name]="stat.icon" [size]="20"></app-icon>
-          </div>
-          <p class="stat-card__label">{{ stat.label }}</p>
-          <span class="stat-card__value">{{ stat.value }}</span>
-        </div>
+        <app-card [icon]="stat.icon" [title]="stat.label" [value]="stat.value"></app-card>
       }
     }
   </section>
 
   @if (!loading()) {
     <section class="chart-grid">
-      <div class="panel">
-        <h2>Itens em estoque por categoria</h2>
+      <app-card title="Itens em estoque por categoria">
         <app-chart type="bar" [labels]="categoryLabels()" [data]="categoryQuantities()" label="Unidades"></app-chart>
-      </div>
+      </app-card>
 
-      <div class="panel">
-        <h2>Valor em estoque por categoria</h2>
+      <app-card title="Valor em estoque por categoria">
         <app-chart type="doughnut" [labels]="categoryLabels()" [data]="categoryValues()" label="R$"></app-chart>
-      </div>
+      </app-card>
     </section>
 
     <section class="lower-grid">
-      <div class="panel">
-        <h2>Atividade recente</h2>
+      <app-card title="Atividade recente">
         @if (recentMovements().length === 0) {
           <p class="empty-hint">Nenhuma movimentação registrada ainda. Acesse "Produtos" para lançar entradas e saídas.</p>
         } @else {
@@ -67,10 +58,9 @@
             }
           </ul>
         }
-      </div>
+      </app-card>
 
-      <div class="panel">
-        <h2>Sua categoria: {{ auth.currentUser()?.preferredCategory }}</h2>
+      <app-card [title]="'Sua categoria: ' + auth.currentUser()?.preferredCategory">
         @if (preferredCategoryProducts().length === 0) {
           <p class="empty-hint">Nenhum produto encontrado nessa categoria.</p>
         } @else {
@@ -86,7 +76,7 @@
             }
           </ul>
         }
-      </div>
+      </app-card>
     </section>
   }
 </div>

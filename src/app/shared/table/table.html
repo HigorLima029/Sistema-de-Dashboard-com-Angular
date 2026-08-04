@@ -1,0 +1,26 @@
+<div class="app-table" [style.--table-grid]="gridTemplate">
+  <div class="app-table__row app-table__row--head">
+    @for (col of columns; track col) {
+      <span>{{ col }}</span>
+    }
+  </div>
+
+  @if (loading) {
+    @for (row of skeletonRows; track row) {
+      <div class="app-table__row">
+        <ng-container [ngTemplateOutlet]="skeletonRowTemplate ?? null"></ng-container>
+      </div>
+    }
+  } @else if (items.length === 0) {
+    <div class="app-table__empty">{{ emptyMessage }}</div>
+  } @else {
+    @for (item of items; track $index) {
+      <div class="app-table__row">
+        <ng-container
+          [ngTemplateOutlet]="rowTemplate ?? null"
+          [ngTemplateOutletContext]="{ $implicit: item }"
+        ></ng-container>
+      </div>
+    }
+  }
+</div>

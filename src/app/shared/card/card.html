@@ -1,0 +1,31 @@
+@if (value !== undefined) {
+  <div class="card card--stat">
+    @if (icon) {
+      <div class="card__icon">
+        <app-icon [name]="icon" [size]="20"></app-icon>
+      </div>
+    }
+    @if (title) {
+      <p class="card__label">{{ title }}</p>
+    }
+    <span class="card__value">{{ value }}</span>
+  </div>
+} @else {
+  <div class="card">
+    @if (title || icon) {
+      <div class="card__header">
+        @if (icon) {
+          <span class="card__icon card__icon--inline">
+            <app-icon [name]="icon" [size]="18"></app-icon>
+          </span>
+        }
+        @if (title) {
+          <h2 class="card__title">{{ title }}</h2>
+        }
+      </div>
+    }
+    <div class="card__body">
+      <ng-content></ng-content>
+    </div>
+  </div>
+}

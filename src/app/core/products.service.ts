@@ -9,6 +9,7 @@ export interface Product {
   price: number;
   category: string;
   image: string;
+  description: string;
   rating: number;
 }
 
@@ -18,6 +19,7 @@ interface RawProduct {
   price: number;
   category: string;
   image: string;
+  description: string;
   rating: { rate: number; count: number };
 }
 
@@ -40,6 +42,7 @@ export class ProductsService {
           price: item.price,
           category: item.category,
           image: item.image,
+          description: item.description,
           rating: item.rating?.rate ?? 0,
         })),
       ),

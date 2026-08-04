@@ -1,0 +1,16 @@
+@if (open) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal" role="dialog" aria-modal="true" [attr.aria-label]="title" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2>{{ title }}</h2>
+        <button class="modal__close" type="button" (click)="close()" aria-label="Fechar">
+          <app-icon name="close" [size]="16"></app-icon>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <ng-content></ng-content>
+      </div>
+    </div>
+  </div>
+}

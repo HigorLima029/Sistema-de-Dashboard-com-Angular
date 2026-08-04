@@ -4,12 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Product, ProductsService } from '../../core/products.service';
 import { StockService } from '../../core/stock.service';
 import { IconComponent } from '../../shared/icon/icon';
+import { ModalComponent } from '../../shared/modal/modal';
 import { SkeletonComponent } from '../../shared/skeleton/skeleton';
+import { TableComponent } from '../../shared/table/table';
 
 @Component({
   selector: 'app-produtos',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, IconComponent, SkeletonComponent],
+  imports: [FormsModule, DecimalPipe, IconComponent, TableComponent, ModalComponent, SkeletonComponent],
   templateUrl: './produtos.html',
   styleUrl: './produtos.scss',
 })
@@ -21,7 +23,7 @@ export class ProdutosComponent {
   readonly products = signal<Product[]>([]);
   readonly search = signal('');
   readonly selectedCategory = signal<string>('todas');
-  readonly skeletonRows = [1, 2, 3, 4, 5];
+  readonly selectedProduct = signal<Product | null>(null);
 
   readonly stepById = signal<Record<number, number>>({});
 
@@ -65,5 +67,13 @@ export class ProdutosComponent {
 
   isLowStock(productId: number): boolean {
     return this.stock.quantityFor(productId) < this.stock.lowStockThreshold;
+  }
+
+  abrirDetalhes(product: Product): void {
+    this.selectedProduct.set(product);
+  }
+
+  fecharDetalhes(): void {
+    this.selectedProduct.set(null);
   }
 }
