@@ -1,8 +1,8 @@
 import { createRequire } from 'module';const require = createRequire(import.meta.url);
-import "./chunk-KQWE5DRV.js";
+import "./chunk-SP62ZTBQ.js";
 import {
   getDOM
-} from "./chunk-AR5JHKXA.js";
+} from "./chunk-DXJCKVWH.js";
 import {
   ApplicationRef,
   ChangeDetectorRef,
@@ -31,6 +31,7 @@ import {
   inject,
   isPromise,
   isSubscribable,
+  require_cjs,
   require_operators,
   setClassMetadata,
   signal,
@@ -47,10 +48,7 @@ import {
   ɵɵdirectiveInject,
   ɵɵgetInheritedFactory,
   ɵɵlistener
-} from "./chunk-VUY5VZTB.js";
-import {
-  require_cjs
-} from "./chunk-O5J3CNTX.js";
+} from "./chunk-FAI4WHEZ.js";
 import {
   __spreadProps,
   __spreadValues,

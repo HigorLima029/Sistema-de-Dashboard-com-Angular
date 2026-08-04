@@ -41,18 +41,23 @@ const DEMO_ACCOUNTS: Record<string, DemoAccount> = {
   },
 };
 
+/**
+ * Estado de sessão do usuário (Signals). O signal interno é privado —
+ * a única forma de alterar a sessão é por `login()`/`logout()`.
+ */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
 
-  readonly currentUser = signal<AppUser | null>(this.restoreSession());
+  private readonly _currentUser = signal<AppUser | null>(this.restoreSession());
+  readonly currentUser = this._currentUser.asReadonly();
 
   login(username: string, password: string): boolean {
     const account = DEMO_ACCOUNTS[username.trim().toLowerCase()];
     if (!account || account.password !== password) return false;
 
-    this.currentUser.set(account.user);
+    this._currentUser.set(account.user);
     if (this.isBrowser) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(account.user));
     }
@@ -60,7 +65,7 @@ export class AuthService {
   }
 
   logout(): void {
-    this.currentUser.set(null);
+    this._currentUser.set(null);
     if (this.isBrowser) {
       localStorage.removeItem(STORAGE_KEY);
     }

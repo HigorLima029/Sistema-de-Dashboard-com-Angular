@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { AuthService } from '../../core/auth.service';
-import { Product, ProductsService } from '../../core/products.service';
+import { ProductsStore } from '../../core/products.store';
 import { StockService } from '../../core/stock.service';
 import { CardComponent } from '../../shared/card/card';
 import { ChartComponent } from '../../shared/chart/chart';
@@ -22,12 +22,12 @@ interface StatCard {
   styleUrl: './dashboard.scss',
 })
 export class DashboardComponent {
-  private readonly productsService = inject(ProductsService);
+  private readonly productsStore = inject(ProductsStore);
   readonly stock = inject(StockService);
   readonly auth = inject(AuthService);
 
-  readonly loading = signal(true);
-  readonly products = signal<Product[]>([]);
+  readonly loading = this.productsStore.loading;
+  readonly products = this.productsStore.products;
   readonly skeletonRows = [1, 2, 3, 4];
 
   readonly stats = computed<StatCard[]>(() => {
@@ -79,10 +79,12 @@ export class DashboardComponent {
   readonly recentMovements = computed(() => this.stock.movements().slice(0, 5));
 
   constructor() {
-    this.productsService.getProducts().subscribe((items) => {
-      this.products.set(items);
-      this.stock.ensureSeeded(items.map((p) => p.id));
-      this.loading.set(false);
+    // sempre que a store de produtos atualizar, garante quantidade inicial no estoque
+    effect(() => {
+      const items = this.products();
+      if (items.length > 0) {
+        this.stock.ensureSeeded(items.map((p) => p.id));
+      }
     });
   }
 }

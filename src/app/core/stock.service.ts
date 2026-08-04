@@ -17,22 +17,30 @@ const MOVEMENTS_KEY = 'inventory-movements-v1';
 const LOW_STOCK_THRESHOLD = 15;
 const MAX_MOVEMENTS_STORED = 30;
 
+/**
+ * Estado de estoque (Signals) — quantidades e histórico de movimentações,
+ * compartilhado por toda a aplicação (Dashboard, Produtos, etc). Os
+ * signals internos são privados; a única forma de alterar o estado é
+ * pelos métodos `ensureSeeded()`/`registrarMovimento()`.
+ */
 @Injectable({ providedIn: 'root' })
 export class StockService {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  readonly stock = signal<Record<number, number>>(this.restoreStock());
-  readonly movements = signal<StockMovement[]>(this.restoreMovements());
+  private readonly _stock = signal<Record<number, number>>(this.restoreStock());
+  private readonly _movements = signal<StockMovement[]>(this.restoreMovements());
 
+  readonly stock = this._stock.asReadonly();
+  readonly movements = this._movements.asReadonly();
   readonly lowStockThreshold = LOW_STOCK_THRESHOLD;
 
   quantityFor(productId: number): number {
-    return this.stock()[productId] ?? this.seedQuantity(productId);
+    return this._stock()[productId] ?? this.seedQuantity(productId);
   }
 
   /** Garante que todo produto carregado da API tenha uma quantidade inicial. */
   ensureSeeded(productIds: number[]): void {
-    const current = { ...this.stock() };
+    const current = { ...this._stock() };
     let changed = false;
 
     for (const id of productIds) {
@@ -43,7 +51,7 @@ export class StockService {
     }
 
     if (changed) {
-      this.stock.set(current);
+      this._stock.set(current);
       this.persistStock(current);
     }
   }
@@ -51,12 +59,12 @@ export class StockService {
   registrarMovimento(productId: number, productTitle: string, type: MovementType, quantity: number): void {
     if (quantity <= 0) return;
 
-    const current = { ...this.stock() };
+    const current = { ...this._stock() };
     const atual = current[productId] ?? this.seedQuantity(productId);
     const proxima = type === 'entrada' ? atual + quantity : Math.max(0, atual - quantity);
 
     current[productId] = proxima;
-    this.stock.set(current);
+    this._stock.set(current);
     this.persistStock(current);
 
     const movimento: StockMovement = {
@@ -68,8 +76,8 @@ export class StockService {
       date: new Date().toISOString(),
     };
 
-    const historico = [movimento, ...this.movements()].slice(0, MAX_MOVEMENTS_STORED);
-    this.movements.set(historico);
+    const historico = [movimento, ...this._movements()].slice(0, MAX_MOVEMENTS_STORED);
+    this._movements.set(historico);
     this.persistMovements(historico);
   }
 

@@ -5,16 +5,23 @@ export type ThemeMode = 'light' | 'dark';
 
 const STORAGE_KEY = 'app-theme';
 
+/**
+ * Estado de tema da aplicação (Signals).
+ * O signal interno é privado — a única forma de alterar o tema
+ * de fora é pelos métodos `toggle()`/`setTheme()`, nunca escrevendo
+ * direto no signal exposto.
+ */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
 
-  readonly theme = signal<ThemeMode>(this.getInitialTheme());
+  private readonly _theme = signal<ThemeMode>(this.getInitialTheme());
+  readonly theme = this._theme.asReadonly();
 
   constructor() {
     effect(() => {
-      const mode = this.theme();
+      const mode = this._theme();
       if (!this.isBrowser) return;
       document.documentElement.setAttribute('data-theme', mode);
       localStorage.setItem(STORAGE_KEY, mode);
@@ -22,11 +29,11 @@ export class ThemeService {
   }
 
   toggle(): void {
-    this.theme.update((current) => (current === 'light' ? 'dark' : 'light'));
+    this._theme.update((current) => (current === 'light' ? 'dark' : 'light'));
   }
 
   setTheme(mode: ThemeMode): void {
-    this.theme.set(mode);
+    this._theme.set(mode);
   }
 
   private getInitialTheme(): ThemeMode {
