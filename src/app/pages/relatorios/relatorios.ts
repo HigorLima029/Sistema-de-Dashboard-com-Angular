@@ -3,7 +3,9 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StockMovement, StockService } from '../../core/stock.service';
 import { CardComponent } from '../../shared/card/card';
+import { IconComponent } from '../../shared/icon/icon';
 import { TableComponent } from '../../shared/table/table';
+import { exportToExcel } from '../../shared/utils/export-excel';
 
 type Periodo = 'hoje' | 'mes' | 'personalizado';
 type TipoRelatorio = 'entrada' | 'saida';
@@ -11,7 +13,7 @@ type TipoRelatorio = 'entrada' | 'saida';
 @Component({
   selector: 'app-relatorios',
   standalone: true,
-  imports: [FormsModule, DatePipe, DecimalPipe, CardComponent, TableComponent],
+  imports: [FormsModule, DatePipe, DecimalPipe, CardComponent, TableComponent, IconComponent],
   templateUrl: './relatorios.html',
   styleUrl: './relatorios.scss',
 })
@@ -46,6 +48,35 @@ export class RelatoriosComponent {
 
   setPeriodo(periodo: Periodo): void {
     this.periodo.set(periodo);
+  }
+
+  exportar(): void {
+    const dados = this.movimentosFiltrados();
+    if (dados.length === 0) return;
+
+    const isEntrada = this.tipo() === 'entrada';
+
+    const rows: Record<string, string | number>[] = isEntrada
+      ? dados.map((m) => ({
+          Data: new Date(m.date).toLocaleString('pt-BR'),
+          Produto: m.productTitle,
+          Quantidade: m.quantity,
+        }))
+      : dados.map((m) => ({
+          Data: new Date(m.date).toLocaleString('pt-BR'),
+          Produto: m.productTitle,
+          Quantidade: m.quantity,
+          Cliente: m.destino?.client ?? '',
+          Destinatário: m.destino?.recipientName ?? '',
+          CPF: m.destino?.cpf ?? '',
+          Endereço: m.destino?.address ?? '',
+        }));
+
+    const sufixoPeriodo = this.periodo() === 'hoje' ? 'hoje' : this.periodo() === 'mes' ? 'ultimo-mes' : 'personalizado';
+    const nomeArquivo = `relatorio-${isEntrada ? 'entradas' : 'saidas'}-${sufixoPeriodo}`;
+    const nomeAba = isEntrada ? 'Entradas' : 'Saídas';
+
+    exportToExcel(nomeArquivo, nomeAba, rows);
   }
 
   private intervaloAtivo(): { inicio: Date; fim: Date } {

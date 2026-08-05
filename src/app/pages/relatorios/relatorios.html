@@ -72,6 +72,16 @@
       icon="chart"
     ></app-card>
     <app-card title="Movimentações no período" [value]="totalMovimentos() + ''" icon="folder"></app-card>
+
+    <button
+      type="button"
+      class="relatorios__export"
+      [disabled]="totalMovimentos() === 0"
+      (click)="exportar()"
+    >
+      <app-icon name="download" [size]="16"></app-icon>
+      Exportar para Excel
+    </button>
   </section>
 
   @if (tipo() === 'entrada') {
