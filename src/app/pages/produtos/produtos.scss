@@ -5,8 +5,88 @@
   animation: fadeInUp var(--transition-base) both;
 }
 
+.produtos__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .produtos__header h1 {
   font-size: 1.5rem;
+}
+
+.produtos__novo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+
+  input,
+  textarea {
+    padding: 0 12px;
+    height: 42px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+    &:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 18%, transparent);
+    }
+  }
+
+  textarea {
+    height: auto;
+    padding: 10px 12px;
+    resize: vertical;
+    font-family: var(--font-body);
+  }
+}
+
+.field__error {
+  color: var(--color-danger);
+  font-size: 0.76rem;
+}
+
+.form__submit {
+  height: 42px;
+  width: 100%;
+  margin-top: 4px;
+  font-size: 0.88rem;
 }
 
 .produtos__subtitle {

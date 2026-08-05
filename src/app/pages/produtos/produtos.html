@@ -1,7 +1,13 @@
 <div class="produtos">
   <div class="produtos__header">
-    <h1>Produtos</h1>
-    <p class="produtos__subtitle">Catálogo real (Fake Store API) com controle de estoque local</p>
+    <div>
+      <h1>Produtos</h1>
+      <p class="produtos__subtitle">Catálogo (Fake Store API + cadastros manuais) com controle de estoque local</p>
+    </div>
+    <button type="button" class="produtos__novo-btn" (click)="abrirNovoProduto()">
+      <app-icon name="folder" [size]="16"></app-icon>
+      Novo produto
+    </button>
   </div>
 
   <div class="produtos__toolbar">
@@ -50,10 +56,10 @@
           [ngModel]="stepFor(product.id)"
           (ngModelChange)="setStep(product.id, $event)"
         />
-        <button type="button" class="produtos__btn produtos__btn--in" (click)="registrar(product, 'entrada')">
+        <button type="button" class="produtos__btn produtos__btn--in" (click)="registrarEntrada(product)">
           + Entrada
         </button>
-        <button type="button" class="produtos__btn produtos__btn--out" (click)="registrar(product, 'saida')">
+        <button type="button" class="produtos__btn produtos__btn--out" (click)="abrirSaida(product)">
           - Saída
         </button>
       </div>
@@ -72,6 +78,7 @@
   </app-table>
 </div>
 
+<!-- Modal: detalhes do produto -->
 <app-modal
   [open]="selectedProduct() !== null"
   [title]="selectedProduct()?.title ?? ''"
@@ -104,13 +111,98 @@
           [ngModel]="stepFor(product.id)"
           (ngModelChange)="setStep(product.id, $event)"
         />
-        <button type="button" class="produtos__btn produtos__btn--in" (click)="registrar(product, 'entrada')">
+        <button type="button" class="produtos__btn produtos__btn--in" (click)="registrarEntrada(product)">
           + Entrada
         </button>
-        <button type="button" class="produtos__btn produtos__btn--out" (click)="registrar(product, 'saida')">
+        <button type="button" class="produtos__btn produtos__btn--out" (click)="abrirSaida(product)">
           - Saída
         </button>
       </div>
     </div>
   }
+</app-modal>
+
+<!-- Modal: registrar saída (com dados do destinatário) -->
+<app-modal
+  [open]="saidaProduct() !== null"
+  [title]="'Registrar saída — ' + (saidaProduct()?.title ?? '')"
+  (closed)="fecharSaida()"
+>
+  @if (saidaProduct()) {
+    <form class="form" [formGroup]="saidaForm" (ngSubmit)="confirmarSaida()">
+      <label class="field">
+        <span>Quantidade</span>
+        <input type="number" min="1" formControlName="quantidade" />
+      </label>
+
+      <label class="field">
+        <span>Destinatário (quem vai receber)</span>
+        <input type="text" formControlName="destinatario" placeholder="Nome completo" />
+      </label>
+
+      <label class="field">
+        <span>CPF</span>
+        <input type="text" formControlName="cpf" placeholder="000.000.000-00" />
+        @if (saidaForm.controls.cpf.touched && saidaForm.controls.cpf.hasError('cpfInvalido')) {
+          <span class="field__error">CPF inválido</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>Cliente (para quem/qual empresa é o uso)</span>
+        <input type="text" formControlName="cliente" placeholder="Nome do cliente" />
+      </label>
+
+      <label class="field">
+        <span>Endereço completo</span>
+        <textarea formControlName="endereco" rows="3" placeholder="Rua, número, bairro, cidade - UF, CEP"></textarea>
+      </label>
+
+      <button type="submit" class="form__submit produtos__btn produtos__btn--out">Confirmar saída</button>
+    </form>
+  }
+</app-modal>
+
+<!-- Modal: cadastrar novo produto -->
+<app-modal [open]="novoProdutoOpen()" title="Novo produto" (closed)="fecharNovoProduto()">
+  <form class="form" [formGroup]="novoProdutoForm" (ngSubmit)="confirmarNovoProduto()">
+    <label class="field">
+      <span>Nome do produto</span>
+      <input type="text" formControlName="title" placeholder="Ex: Caixa de parafusos M6" />
+    </label>
+
+    <label class="field">
+      <span>Categoria</span>
+      <input type="text" formControlName="category" placeholder="Ex: ferragens" list="categorias-existentes" />
+      <datalist id="categorias-existentes">
+        @for (category of categories(); track category) {
+          @if (category !== 'todas') {
+            <option [value]="category"></option>
+          }
+        }
+      </datalist>
+    </label>
+
+    <label class="field">
+      <span>Preço (R$)</span>
+      <input type="number" min="0" step="0.01" formControlName="price" />
+    </label>
+
+    <label class="field">
+      <span>Quantidade inicial em estoque</span>
+      <input type="number" min="0" formControlName="quantidadeInicial" />
+    </label>
+
+    <label class="field">
+      <span>URL da imagem (opcional)</span>
+      <input type="text" formControlName="image" placeholder="https://..." />
+    </label>
+
+    <label class="field">
+      <span>Descrição (opcional)</span>
+      <textarea formControlName="description" rows="3" placeholder="Detalhes do produto"></textarea>
+    </label>
+
+    <button type="submit" class="form__submit produtos__btn produtos__btn--in">Cadastrar produto</button>
+  </form>
 </app-modal>

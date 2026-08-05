@@ -3,6 +3,13 @@ import { isPlatformBrowser } from '@angular/common';
 
 export type MovementType = 'entrada' | 'saida';
 
+export interface StockMovementDestino {
+  recipientName: string;
+  cpf: string;
+  client: string;
+  address: string;
+}
+
 export interface StockMovement {
   id: string;
   productId: number;
@@ -10,18 +17,21 @@ export interface StockMovement {
   type: MovementType;
   quantity: number;
   date: string;
+  /** Preenchido apenas em movimentações de saída. */
+  destino?: StockMovementDestino;
 }
 
 const STOCK_KEY = 'inventory-stock-v1';
 const MOVEMENTS_KEY = 'inventory-movements-v1';
 const LOW_STOCK_THRESHOLD = 15;
-const MAX_MOVEMENTS_STORED = 30;
+// histórico usado nos relatórios por período — bem generoso, não é só "atividade recente"
+const MAX_MOVEMENTS_STORED = 2000;
 
 /**
  * Estado de estoque (Signals) — quantidades e histórico de movimentações,
- * compartilhado por toda a aplicação (Dashboard, Produtos, etc). Os
- * signals internos são privados; a única forma de alterar o estado é
- * pelos métodos `ensureSeeded()`/`registrarMovimento()`.
+ * compartilhado por toda a aplicação (Dashboard, Produtos, Relatórios).
+ * Os signals internos são privados; a única forma de alterar o estado é
+ * pelos métodos públicos.
  */
 @Injectable({ providedIn: 'root' })
 export class StockService {
@@ -56,7 +66,20 @@ export class StockService {
     }
   }
 
-  registrarMovimento(productId: number, productTitle: string, type: MovementType, quantity: number): void {
+  /** Define explicitamente a quantidade em estoque de um produto (ex: ao cadastrar um novo). */
+  definirQuantidade(productId: number, quantity: number): void {
+    const current = { ...this._stock(), [productId]: Math.max(0, quantity) };
+    this._stock.set(current);
+    this.persistStock(current);
+  }
+
+  registrarMovimento(
+    productId: number,
+    productTitle: string,
+    type: MovementType,
+    quantity: number,
+    destino?: StockMovementDestino,
+  ): void {
     if (quantity <= 0) return;
 
     const current = { ...this._stock() };
@@ -74,6 +97,7 @@ export class StockService {
       type,
       quantity,
       date: new Date().toISOString(),
+      destino: type === 'saida' ? destino : undefined,
     };
 
     const historico = [movimento, ...this._movements()].slice(0, MAX_MOVEMENTS_STORED);

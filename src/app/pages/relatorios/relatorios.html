@@ -1,0 +1,108 @@
+<div class="relatorios">
+  <div class="relatorios__header">
+    <h1>Relatórios</h1>
+    <p class="relatorios__subtitle">Movimentações de estoque por período</p>
+  </div>
+
+  <div class="relatorios__tabs">
+    <button
+      type="button"
+      class="relatorios__tab"
+      [class.relatorios__tab--active]="tipo() === 'entrada'"
+      (click)="setTipo('entrada')"
+    >
+      Relatório de Entradas
+    </button>
+    <button
+      type="button"
+      class="relatorios__tab"
+      [class.relatorios__tab--active]="tipo() === 'saida'"
+      (click)="setTipo('saida')"
+    >
+      Relatório de Saídas
+    </button>
+  </div>
+
+  <div class="relatorios__filtros">
+    <div class="relatorios__periodos">
+      <button
+        type="button"
+        class="relatorios__periodo"
+        [class.relatorios__periodo--active]="periodo() === 'hoje'"
+        (click)="setPeriodo('hoje')"
+      >
+        Hoje
+      </button>
+      <button
+        type="button"
+        class="relatorios__periodo"
+        [class.relatorios__periodo--active]="periodo() === 'mes'"
+        (click)="setPeriodo('mes')"
+      >
+        Último mês
+      </button>
+      <button
+        type="button"
+        class="relatorios__periodo"
+        [class.relatorios__periodo--active]="periodo() === 'personalizado'"
+        (click)="setPeriodo('personalizado')"
+      >
+        Personalizado
+      </button>
+    </div>
+
+    @if (periodo() === 'personalizado') {
+      <div class="relatorios__datas">
+        <label>
+          <span>De</span>
+          <input type="date" [ngModel]="dataInicio()" (ngModelChange)="dataInicio.set($event)" />
+        </label>
+        <label>
+          <span>Até</span>
+          <input type="date" [ngModel]="dataFim()" (ngModelChange)="dataFim.set($event)" />
+        </label>
+      </div>
+    }
+  </div>
+
+  <section class="relatorios__stats">
+    <app-card
+      [title]="tipo() === 'entrada' ? 'Total de entradas' : 'Total de saídas'"
+      [value]="(totalQuantidade() | number: '1.0-0') ?? '0'"
+      icon="chart"
+    ></app-card>
+    <app-card title="Movimentações no período" [value]="totalMovimentos() + ''" icon="folder"></app-card>
+  </section>
+
+  @if (tipo() === 'entrada') {
+    <app-table
+      [columns]="['Data', 'Produto', 'Quantidade']"
+      gridTemplate="1.1fr 2fr 1fr"
+      [items]="movimentosFiltrados()"
+      emptyMessage="Nenhuma entrada registrada nesse período."
+    >
+      <ng-template #rowTemplate let-item>
+        <span>{{ item.date | date: 'dd/MM/yyyy HH:mm' }}</span>
+        <span [title]="item.productTitle">{{ item.productTitle }}</span>
+        <span class="relatorios__qtd">{{ item.quantity }} un.</span>
+      </ng-template>
+    </app-table>
+  } @else {
+    <app-table
+      [columns]="['Data', 'Produto', 'Qtd.', 'Cliente', 'Destinatário', 'CPF', 'Endereço']"
+      gridTemplate="1fr 1.5fr 0.6fr 1.1fr 1.1fr 0.9fr 1.6fr"
+      [items]="movimentosFiltrados()"
+      emptyMessage="Nenhuma saída registrada nesse período."
+    >
+      <ng-template #rowTemplate let-item>
+        <span>{{ item.date | date: 'dd/MM/yyyy HH:mm' }}</span>
+        <span [title]="item.productTitle">{{ item.productTitle }}</span>
+        <span class="relatorios__qtd">{{ item.quantity }} un.</span>
+        <span [title]="item.destino?.client">{{ item.destino?.client }}</span>
+        <span [title]="item.destino?.recipientName">{{ item.destino?.recipientName }}</span>
+        <span>{{ item.destino?.cpf }}</span>
+        <span [title]="item.destino?.address">{{ item.destino?.address }}</span>
+      </ng-template>
+    </app-table>
+  }
+</div>

@@ -4,6 +4,7 @@ import { LayoutComponent } from './layout/layout';
 import { DashboardComponent } from './pages/dashboard/dashboard';
 import { LoginComponent } from './pages/login/login';
 import { ProdutosComponent } from './pages/produtos/produtos';
+import { RelatoriosComponent } from './pages/relatorios/relatorios';
 import { PlaceholderComponent } from './shared/placeholder/placeholder';
 
 export const routes: Routes = [
@@ -15,12 +16,7 @@ export const routes: Routes = [
     children: [
       { path: '', component: DashboardComponent, title: 'Dashboard' },
       { path: 'produtos', component: ProdutosComponent, title: 'Produtos' },
-      {
-        path: 'relatorios',
-        component: PlaceholderComponent,
-        data: { title: 'Relatórios' },
-        title: 'Relatórios',
-      },
+      { path: 'relatorios', component: RelatoriosComponent, title: 'Relatórios' },
       {
         path: 'configuracoes',
         component: PlaceholderComponent,
