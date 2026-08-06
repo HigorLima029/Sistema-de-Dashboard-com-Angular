@@ -105,6 +105,13 @@ export class StockService {
     this.persistMovements(historico);
   }
 
+  /** Corrige os dados de destino (destinatário/CPF/cliente/endereço) de uma saída já registrada. */
+  atualizarDestino(movementId: string, destino: StockMovementDestino): void {
+    const historico = this._movements().map((m) => (m.id === movementId ? { ...m, destino } : m));
+    this._movements.set(historico);
+    this.persistMovements(historico);
+  }
+
   private seedQuantity(productId: number): number {
     return 10 + ((productId * 37) % 70);
   }

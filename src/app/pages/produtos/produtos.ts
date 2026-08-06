@@ -1,13 +1,15 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { cpfValidator } from '../../core/validators';
 import { NewProductInput, Product, ProductsStore } from '../../core/products.store';
 import { StockService } from '../../core/stock.service';
+import { cpfValidator } from '../../core/validators';
 import { IconComponent } from '../../shared/icon/icon';
 import { ModalComponent } from '../../shared/modal/modal';
 import { SkeletonComponent } from '../../shared/skeleton/skeleton';
 import { TableComponent } from '../../shared/table/table';
+
+type ProdutoModalMode = 'novo' | 'editar' | null;
 
 @Component({
   selector: 'app-produtos',
@@ -35,7 +37,9 @@ export class ProdutosComponent {
   readonly selectedCategory = signal<string>('todas');
   readonly selectedProduct = signal<Product | null>(null);
   readonly saidaProduct = signal<Product | null>(null);
-  readonly novoProdutoOpen = signal(false);
+
+  readonly produtoModalMode = signal<ProdutoModalMode>(null);
+  readonly editingProductId = signal<number | null>(null);
 
   readonly stepById = signal<Record<number, number>>({});
 
@@ -63,7 +67,7 @@ export class ProdutosComponent {
     endereco: ['', Validators.required],
   });
 
-  readonly novoProdutoForm = this.fb.nonNullable.group({
+  readonly produtoForm = this.fb.nonNullable.group({
     title: ['', Validators.required],
     category: ['', Validators.required],
     price: [0, [Validators.required, Validators.min(0.01)]],
@@ -146,7 +150,7 @@ export class ProdutosComponent {
   }
 
   abrirNovoProduto(): void {
-    this.novoProdutoForm.reset({
+    this.produtoForm.reset({
       title: '',
       category: '',
       price: 0,
@@ -154,20 +158,36 @@ export class ProdutosComponent {
       image: '',
       description: '',
     });
-    this.novoProdutoOpen.set(true);
+    this.editingProductId.set(null);
+    this.produtoModalMode.set('novo');
   }
 
-  fecharNovoProduto(): void {
-    this.novoProdutoOpen.set(false);
+  abrirEditarProduto(product: Product): void {
+    this.selectedProduct.set(null);
+    this.produtoForm.reset({
+      title: product.title,
+      category: product.category,
+      price: product.price,
+      quantidadeInicial: this.stock.quantityFor(product.id),
+      image: product.image,
+      description: product.description,
+    });
+    this.editingProductId.set(product.id);
+    this.produtoModalMode.set('editar');
   }
 
-  confirmarNovoProduto(): void {
-    if (this.novoProdutoForm.invalid) {
-      this.novoProdutoForm.markAllAsTouched();
+  fecharProdutoModal(): void {
+    this.produtoModalMode.set(null);
+    this.editingProductId.set(null);
+  }
+
+  confirmarProduto(): void {
+    if (this.produtoForm.invalid) {
+      this.produtoForm.markAllAsTouched();
       return;
     }
 
-    const { title, category, price, quantidadeInicial, image, description } = this.novoProdutoForm.getRawValue();
+    const { title, category, price, quantidadeInicial, image, description } = this.produtoForm.getRawValue();
 
     const input: NewProductInput = {
       title,
@@ -177,8 +197,15 @@ export class ProdutosComponent {
       description: description.trim() || 'Produto cadastrado manualmente.',
     };
 
-    const created = this.productsStore.addProduct(input);
-    this.stock.definirQuantidade(created.id, quantidadeInicial);
-    this.fecharNovoProduto();
+    if (this.produtoModalMode() === 'editar' && this.editingProductId() !== null) {
+      const id = this.editingProductId()!;
+      this.productsStore.updateProduct(id, input);
+      this.stock.definirQuantidade(id, quantidadeInicial);
+    } else {
+      const created = this.productsStore.addProduct(input);
+      this.stock.definirQuantidade(created.id, quantidadeInicial);
+    }
+
+    this.fecharProdutoModal();
   }
 }

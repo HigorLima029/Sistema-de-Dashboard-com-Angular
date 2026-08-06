@@ -1,9 +1,11 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StockMovement, StockService } from '../../core/stock.service';
+import { cpfValidator } from '../../core/validators';
 import { CardComponent } from '../../shared/card/card';
 import { IconComponent } from '../../shared/icon/icon';
+import { ModalComponent } from '../../shared/modal/modal';
 import { TableComponent } from '../../shared/table/table';
 import { exportToExcel } from '../../shared/utils/export-excel';
 
@@ -13,17 +15,35 @@ type TipoRelatorio = 'entrada' | 'saida';
 @Component({
   selector: 'app-relatorios',
   standalone: true,
-  imports: [FormsModule, DatePipe, DecimalPipe, CardComponent, TableComponent, IconComponent],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    DatePipe,
+    DecimalPipe,
+    CardComponent,
+    TableComponent,
+    IconComponent,
+    ModalComponent,
+  ],
   templateUrl: './relatorios.html',
   styleUrl: './relatorios.scss',
 })
 export class RelatoriosComponent {
   private readonly stock = inject(StockService);
+  private readonly fb = inject(FormBuilder);
 
   readonly tipo = signal<TipoRelatorio>('saida');
   readonly periodo = signal<Periodo>('mes');
   readonly dataInicio = signal(this.formatDate(this.umMesAtras()));
   readonly dataFim = signal(this.formatDate(new Date()));
+  readonly editingMovement = signal<StockMovement | null>(null);
+
+  readonly editDestinoForm = this.fb.nonNullable.group({
+    destinatario: ['', Validators.required],
+    cpf: ['', [Validators.required, cpfValidator]],
+    cliente: ['', Validators.required],
+    endereco: ['', Validators.required],
+  });
 
   readonly movimentosFiltrados = computed<StockMovement[]>(() => {
     const { inicio, fim } = this.intervaloAtivo();
@@ -48,6 +68,41 @@ export class RelatoriosComponent {
 
   setPeriodo(periodo: Periodo): void {
     this.periodo.set(periodo);
+  }
+
+  abrirEditarDestino(movement: StockMovement): void {
+    this.editDestinoForm.reset({
+      destinatario: movement.destino?.recipientName ?? '',
+      cpf: movement.destino?.cpf ?? '',
+      cliente: movement.destino?.client ?? '',
+      endereco: movement.destino?.address ?? '',
+    });
+    this.editingMovement.set(movement);
+  }
+
+  fecharEditarDestino(): void {
+    this.editingMovement.set(null);
+  }
+
+  confirmarEditarDestino(): void {
+    if (this.editDestinoForm.invalid) {
+      this.editDestinoForm.markAllAsTouched();
+      return;
+    }
+
+    const movement = this.editingMovement();
+    if (!movement) return;
+
+    const { destinatario, cpf, cliente, endereco } = this.editDestinoForm.getRawValue();
+
+    this.stock.atualizarDestino(movement.id, {
+      recipientName: destinatario,
+      cpf,
+      client: cliente,
+      address: endereco,
+    });
+
+    this.fecharEditarDestino();
   }
 
   exportar(): void {

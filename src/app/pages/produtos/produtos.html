@@ -36,10 +36,21 @@
     emptyMessage="Nenhum produto encontrado para esse filtro."
   >
     <ng-template #rowTemplate let-product>
-      <button type="button" class="produtos__product" (click)="abrirDetalhes(product)">
-        <img [src]="product.image" [alt]="product.title" />
-        <span [title]="product.title">{{ product.title }}</span>
-      </button>
+      <div class="produtos__product-cell">
+        <button type="button" class="produtos__product" (click)="abrirDetalhes(product)">
+          <img [src]="product.image" [alt]="product.title" />
+          <span [title]="product.title">{{ product.title }}</span>
+        </button>
+        <button
+          type="button"
+          class="produtos__edit-btn"
+          title="Editar produto"
+          aria-label="Editar produto"
+          (click)="abrirEditarProduto(product)"
+        >
+          <app-icon name="edit" [size]="14"></app-icon>
+        </button>
+      </div>
       <span class="produtos__category">{{ product.category }}</span>
       <span class="produtos__price">{{ product.price | number: '1.2-2' }}</span>
       <span class="produtos__stock" [class.produtos__stock--low]="isLowStock(product.id)">
@@ -117,6 +128,10 @@
         <button type="button" class="produtos__btn produtos__btn--out" (click)="abrirSaida(product)">
           - Saída
         </button>
+        <button type="button" class="produtos__btn produtos__btn--edit" (click)="abrirEditarProduto(product)">
+          <app-icon name="edit" [size]="13"></app-icon>
+          Editar
+        </button>
       </div>
     </div>
   }
@@ -163,9 +178,13 @@
   }
 </app-modal>
 
-<!-- Modal: cadastrar novo produto -->
-<app-modal [open]="novoProdutoOpen()" title="Novo produto" (closed)="fecharNovoProduto()">
-  <form class="form" [formGroup]="novoProdutoForm" (ngSubmit)="confirmarNovoProduto()">
+<!-- Modal: cadastrar / editar produto -->
+<app-modal
+  [open]="produtoModalMode() !== null"
+  [title]="produtoModalMode() === 'editar' ? 'Editar produto' : 'Novo produto'"
+  (closed)="fecharProdutoModal()"
+>
+  <form class="form" [formGroup]="produtoForm" (ngSubmit)="confirmarProduto()">
     <label class="field">
       <span>Nome do produto</span>
       <input type="text" formControlName="title" placeholder="Ex: Caixa de parafusos M6" />
@@ -189,7 +208,7 @@
     </label>
 
     <label class="field">
-      <span>Quantidade inicial em estoque</span>
+      <span>Quantidade em estoque</span>
       <input type="number" min="0" formControlName="quantidadeInicial" />
     </label>
 
@@ -203,6 +222,8 @@
       <textarea formControlName="description" rows="3" placeholder="Detalhes do produto"></textarea>
     </label>
 
-    <button type="submit" class="form__submit produtos__btn produtos__btn--in">Cadastrar produto</button>
+    <button type="submit" class="form__submit produtos__btn produtos__btn--in">
+      {{ produtoModalMode() === 'editar' ? 'Salvar alterações' : 'Cadastrar produto' }}
+    </button>
   </form>
 </app-modal>

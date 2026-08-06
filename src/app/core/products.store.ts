@@ -32,6 +32,7 @@ interface RawProduct {
 
 const API_URL = 'https://fakestoreapi.com/products';
 const LOCAL_PRODUCTS_KEY = 'inventory-local-products-v1';
+const OVERRIDES_KEY = 'inventory-product-overrides-v1';
 
 /**
  * Store de produtos (Signals). Busca a API pública uma vez e mantém o
@@ -42,6 +43,12 @@ const LOCAL_PRODUCTS_KEY = 'inventory-local-products-v1';
  * separado, persistido em `localStorage`, e são somados ao catálogo
  * da API no signal público `products`. Recebem ids negativos para
  * nunca colidir com os ids reais da API.
+ *
+ * Edições (`updateProduct`) em produtos da API (que não têm um
+ * backend próprio pra salvar) ficam guardadas como "overrides" —
+ * um mapa de alterações por id, aplicado por cima do produto
+ * original ao montar `products`. Produtos cadastrados manualmente
+ * são editados diretamente.
  */
 @Injectable({ providedIn: 'root' })
 export class ProductsStore {
@@ -50,9 +57,14 @@ export class ProductsStore {
 
   private readonly _apiProducts = signal<Product[]>([]);
   private readonly _localProducts = signal<Product[]>(this.restoreLocal());
+  private readonly _overrides = signal<Record<number, NewProductInput>>(this.restoreOverrides());
   private readonly _loading = signal(true);
 
-  readonly products = computed(() => [...this._localProducts(), ...this._apiProducts()]);
+  readonly products = computed(() => {
+    const overrides = this._overrides();
+    const apiComOverrides = this._apiProducts().map((p) => (overrides[p.id] ? { ...p, ...overrides[p.id] } : p));
+    return [...this._localProducts(), ...apiComOverrides];
+  });
   readonly loading = this._loading.asReadonly();
 
   constructor() {
@@ -99,6 +111,22 @@ export class ProductsStore {
     return product;
   }
 
+  /** Edita um produto existente — seja ele cadastrado manualmente ou vindo da API. */
+  updateProduct(id: number, changes: NewProductInput): void {
+    const isLocal = this._localProducts().some((p) => p.id === id);
+
+    if (isLocal) {
+      const updated = this._localProducts().map((p) => (p.id === id ? { ...p, ...changes } : p));
+      this._localProducts.set(updated);
+      this.persistLocal(updated);
+      return;
+    }
+
+    const overrides = { ...this._overrides(), [id]: changes };
+    this._overrides.set(overrides);
+    this.persistOverrides(overrides);
+  }
+
   private restoreLocal(): Product[] {
     if (!this.isBrowser) return [];
     try {
@@ -109,7 +137,21 @@ export class ProductsStore {
     }
   }
 
+  private restoreOverrides(): Record<number, NewProductInput> {
+    if (!this.isBrowser) return {};
+    try {
+      const raw = localStorage.getItem(OVERRIDES_KEY);
+      return raw ? (JSON.parse(raw) as Record<number, NewProductInput>) : {};
+    } catch {
+      return {};
+    }
+  }
+
   private persistLocal(value: Product[]): void {
     if (this.isBrowser) localStorage.setItem(LOCAL_PRODUCTS_KEY, JSON.stringify(value));
+  }
+
+  private persistOverrides(value: Record<number, NewProductInput>): void {
+    if (this.isBrowser) localStorage.setItem(OVERRIDES_KEY, JSON.stringify(value));
   }
 }

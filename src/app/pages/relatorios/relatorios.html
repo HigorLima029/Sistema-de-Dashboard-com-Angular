@@ -99,8 +99,8 @@
     </app-table>
   } @else {
     <app-table
-      [columns]="['Data', 'Produto', 'Qtd.', 'Cliente', 'Destinatário', 'CPF', 'Endereço']"
-      gridTemplate="1fr 1.5fr 0.6fr 1.1fr 1.1fr 0.9fr 1.6fr"
+      [columns]="['Data', 'Produto', 'Qtd.', 'Cliente', 'Destinatário', 'CPF', 'Endereço', '']"
+      gridTemplate="1fr 1.4fr 0.6fr 1fr 1fr 0.9fr 1.5fr 0.5fr"
       [items]="movimentosFiltrados()"
       emptyMessage="Nenhuma saída registrada nesse período."
     >
@@ -112,7 +112,52 @@
         <span [title]="item.destino?.recipientName">{{ item.destino?.recipientName }}</span>
         <span>{{ item.destino?.cpf }}</span>
         <span [title]="item.destino?.address">{{ item.destino?.address }}</span>
+        <button
+          type="button"
+          class="relatorios__edit-btn"
+          title="Corrigir dados dessa saída"
+          aria-label="Editar destino"
+          (click)="abrirEditarDestino(item)"
+        >
+          <app-icon name="edit" [size]="14"></app-icon>
+        </button>
       </ng-template>
     </app-table>
   }
 </div>
+
+<!-- Modal: corrigir dados de destino de uma saída -->
+<app-modal
+  [open]="editingMovement() !== null"
+  [title]="'Corrigir saída — ' + (editingMovement()?.productTitle ?? '')"
+  (closed)="fecharEditarDestino()"
+>
+  @if (editingMovement()) {
+    <form class="form" [formGroup]="editDestinoForm" (ngSubmit)="confirmarEditarDestino()">
+      <label class="field">
+        <span>Destinatário (quem vai receber)</span>
+        <input type="text" formControlName="destinatario" placeholder="Nome completo" />
+      </label>
+
+      <label class="field">
+        <span>CPF</span>
+        <input type="text" formControlName="cpf" placeholder="000.000.000-00" />
+        @if (editDestinoForm.controls.cpf.touched && editDestinoForm.controls.cpf.hasError('cpfInvalido')) {
+          <span class="field__error">CPF inválido</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>Cliente</span>
+        <input type="text" formControlName="cliente" placeholder="Nome do cliente" />
+      </label>
+
+      <label class="field">
+        <span>Endereço completo</span>
+        <textarea formControlName="endereco" rows="3" placeholder="Rua, número, bairro, cidade - UF, CEP"></textarea>
+      </label>
+
+      <button type="submit" class="form__submit">Salvar correção</button>
+    </form>
+  }
+</app-modal>
