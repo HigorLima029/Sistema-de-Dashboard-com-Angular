@@ -17,7 +17,8 @@ export type IconName =
   | 'logout'
   | 'close'
   | 'download'
-  | 'edit';
+  | 'edit'
+  | 'trash';
 
 @Component({
   selector: 'app-icon',

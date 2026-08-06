@@ -50,6 +50,15 @@
         >
           <app-icon name="edit" [size]="14"></app-icon>
         </button>
+        <button
+          type="button"
+          class="produtos__edit-btn produtos__edit-btn--danger"
+          title="Excluir produto"
+          aria-label="Excluir produto"
+          (click)="abrirExcluir(product)"
+        >
+          <app-icon name="trash" [size]="14"></app-icon>
+        </button>
       </div>
       <span class="produtos__category">{{ product.category }}</span>
       <span class="produtos__price">{{ product.price | number: '1.2-2' }}</span>
@@ -132,7 +141,31 @@
           <app-icon name="edit" [size]="13"></app-icon>
           Editar
         </button>
+        <button type="button" class="produtos__btn produtos__btn--danger" (click)="abrirExcluir(product)">
+          <app-icon name="trash" [size]="13"></app-icon>
+          Excluir
+        </button>
       </div>
+    </div>
+  }
+</app-modal>
+
+<!-- Modal: confirmar exclusão -->
+<app-modal
+  [open]="productToDelete() !== null"
+  title="Excluir produto"
+  (closed)="fecharExcluir()"
+>
+  @if (productToDelete(); as product) {
+    <p class="produtos__confirm-text">
+      Tem certeza que quer excluir <strong>{{ product.title }}</strong>? Essa ação não pode ser desfeita.
+    </p>
+    <div class="produtos__confirm-acoes">
+      <button type="button" class="produtos__btn" (click)="fecharExcluir()">Cancelar</button>
+      <button type="button" class="produtos__btn produtos__btn--danger" (click)="confirmarExclusao()">
+        <app-icon name="trash" [size]="13"></app-icon>
+        Sim, excluir
+      </button>
     </div>
   }
 </app-modal>

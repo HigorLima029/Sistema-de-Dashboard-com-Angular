@@ -116,6 +116,36 @@
   }
 }
 
+.produtos__edit-btn--danger:hover {
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
+  color: var(--color-danger);
+}
+
+.produtos__btn--danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-danger);
+  border-color: color-mix(in srgb, var(--color-danger) 40%, transparent);
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  }
+}
+
+.produtos__confirm-text {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.produtos__confirm-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
 .produtos__btn--edit {
   display: inline-flex;
   align-items: center;

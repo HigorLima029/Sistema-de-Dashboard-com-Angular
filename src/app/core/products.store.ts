@@ -33,6 +33,7 @@ interface RawProduct {
 const API_URL = 'https://fakestoreapi.com/products';
 const LOCAL_PRODUCTS_KEY = 'inventory-local-products-v1';
 const OVERRIDES_KEY = 'inventory-product-overrides-v1';
+const HIDDEN_KEY = 'inventory-hidden-products-v1';
 
 /**
  * Store de produtos (Signals). Busca a API pública uma vez e mantém o
@@ -49,6 +50,10 @@ const OVERRIDES_KEY = 'inventory-product-overrides-v1';
  * um mapa de alterações por id, aplicado por cima do produto
  * original ao montar `products`. Produtos cadastrados manualmente
  * são editados diretamente.
+ *
+ * Exclusão (`deleteProduct`) remove de vez os cadastrados manualmente;
+ * produtos da API são apenas ocultados (lista de ids escondidos),
+ * já que não existe como apagar de verdade de uma API pública alheia.
  */
 @Injectable({ providedIn: 'root' })
 export class ProductsStore {
@@ -58,12 +63,18 @@ export class ProductsStore {
   private readonly _apiProducts = signal<Product[]>([]);
   private readonly _localProducts = signal<Product[]>(this.restoreLocal());
   private readonly _overrides = signal<Record<number, NewProductInput>>(this.restoreOverrides());
+  private readonly _hiddenIds = signal<number[]>(this.restoreHidden());
   private readonly _loading = signal(true);
 
   readonly products = computed(() => {
     const overrides = this._overrides();
-    const apiComOverrides = this._apiProducts().map((p) => (overrides[p.id] ? { ...p, ...overrides[p.id] } : p));
-    return [...this._localProducts(), ...apiComOverrides];
+    const hidden = new Set(this._hiddenIds());
+
+    const apiVisiveis = this._apiProducts()
+      .filter((p) => !hidden.has(p.id))
+      .map((p) => (overrides[p.id] ? { ...p, ...overrides[p.id] } : p));
+
+    return [...this._localProducts(), ...apiVisiveis];
   });
   readonly loading = this._loading.asReadonly();
 
@@ -127,6 +138,22 @@ export class ProductsStore {
     this.persistOverrides(overrides);
   }
 
+  /** Exclui um produto — remove de vez se for cadastro manual, ou oculta se vier da API. */
+  deleteProduct(id: number): void {
+    const isLocal = this._localProducts().some((p) => p.id === id);
+
+    if (isLocal) {
+      const updated = this._localProducts().filter((p) => p.id !== id);
+      this._localProducts.set(updated);
+      this.persistLocal(updated);
+      return;
+    }
+
+    const hidden = [...this._hiddenIds(), id];
+    this._hiddenIds.set(hidden);
+    this.persistHidden(hidden);
+  }
+
   private restoreLocal(): Product[] {
     if (!this.isBrowser) return [];
     try {
@@ -147,11 +174,25 @@ export class ProductsStore {
     }
   }
 
+  private restoreHidden(): number[] {
+    if (!this.isBrowser) return [];
+    try {
+      const raw = localStorage.getItem(HIDDEN_KEY);
+      return raw ? (JSON.parse(raw) as number[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
   private persistLocal(value: Product[]): void {
     if (this.isBrowser) localStorage.setItem(LOCAL_PRODUCTS_KEY, JSON.stringify(value));
   }
 
   private persistOverrides(value: Record<number, NewProductInput>): void {
     if (this.isBrowser) localStorage.setItem(OVERRIDES_KEY, JSON.stringify(value));
+  }
+
+  private persistHidden(value: number[]): void {
+    if (this.isBrowser) localStorage.setItem(HIDDEN_KEY, JSON.stringify(value));
   }
 }

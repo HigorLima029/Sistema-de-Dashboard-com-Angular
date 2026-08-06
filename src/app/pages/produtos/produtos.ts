@@ -40,6 +40,7 @@ export class ProdutosComponent {
 
   readonly produtoModalMode = signal<ProdutoModalMode>(null);
   readonly editingProductId = signal<number | null>(null);
+  readonly productToDelete = signal<Product | null>(null);
 
   readonly stepById = signal<Record<number, number>>({});
 
@@ -207,5 +208,23 @@ export class ProdutosComponent {
     }
 
     this.fecharProdutoModal();
+  }
+
+  abrirExcluir(product: Product): void {
+    this.selectedProduct.set(null);
+    this.fecharProdutoModal();
+    this.productToDelete.set(product);
+  }
+
+  fecharExcluir(): void {
+    this.productToDelete.set(null);
+  }
+
+  confirmarExclusao(): void {
+    const product = this.productToDelete();
+    if (!product) return;
+
+    this.productsStore.deleteProduct(product.id);
+    this.fecharExcluir();
   }
 }
