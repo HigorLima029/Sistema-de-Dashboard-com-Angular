@@ -19,6 +19,8 @@ export interface StockMovement {
   date: string;
   /** Preenchido apenas em movimentações de saída. */
   destino?: StockMovementDestino;
+  /** IMEIs dos aparelhos dessa movimentação (opcional — só para dispositivos rastreados por IMEI). */
+  imeis?: string[];
 }
 
 const STOCK_KEY = 'inventory-stock-v1';
@@ -79,6 +81,7 @@ export class StockService {
     type: MovementType,
     quantity: number,
     destino?: StockMovementDestino,
+    imeis?: string[],
   ): void {
     if (quantity <= 0) return;
 
@@ -98,6 +101,7 @@ export class StockService {
       quantity,
       date: new Date().toISOString(),
       destino: type === 'saida' ? destino : undefined,
+      imeis: type === 'saida' && imeis?.length ? imeis : undefined,
     };
 
     const historico = [movimento, ...this._movements()].slice(0, MAX_MOVEMENTS_STORED);

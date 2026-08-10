@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, effect, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { ProductsStore } from '../../core/products.store';
 import { StockService } from '../../core/stock.service';
@@ -12,6 +13,8 @@ interface StatCard {
   label: string;
   value: string;
   icon: IconName;
+  /** Query params pra navegar até /produtos já filtrado. Ausente = card não clicável. */
+  queryParams?: Record<string, string>;
 }
 
 @Component({
@@ -23,6 +26,7 @@ interface StatCard {
 })
 export class DashboardComponent {
   private readonly productsStore = inject(ProductsStore);
+  private readonly router = inject(Router);
   readonly stock = inject(StockService);
   readonly auth = inject(AuthService);
 
@@ -35,18 +39,35 @@ export class DashboardComponent {
     const totalItens = items.reduce((sum, p) => sum + this.stock.quantityFor(p.id), 0);
     const valorTotal = items.reduce((sum, p) => sum + this.stock.quantityFor(p.id) * p.price, 0);
     const baixoEstoque = items.filter((p) => this.stock.quantityFor(p.id) < this.stock.lowStockThreshold).length;
+    const semFiltro: Record<string, string> = {};
 
     return [
-      { label: 'Produtos cadastrados', value: `${items.length}`, icon: 'folder' },
-      { label: 'Itens em estoque', value: totalItens.toLocaleString('pt-BR'), icon: 'dashboard' },
+      { label: 'Produtos cadastrados', value: `${items.length}`, icon: 'folder', queryParams: semFiltro },
+      {
+        label: 'Itens em estoque',
+        value: totalItens.toLocaleString('pt-BR'),
+        icon: 'dashboard',
+        queryParams: semFiltro,
+      },
       {
         label: 'Valor total em estoque',
         value: valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
         icon: 'chart',
+        // sem queryParams: propositalmente não clicável
       },
-      { label: 'Produtos com estoque baixo', value: `${baixoEstoque}`, icon: 'bell' },
+      {
+        label: 'Produtos com estoque baixo',
+        value: `${baixoEstoque}`,
+        icon: 'bell',
+        queryParams: { estoque: 'baixo' },
+      },
     ];
   });
+
+  irParaProdutos(stat: StatCard): void {
+    if (!stat.queryParams) return;
+    this.router.navigate(['/produtos'], { queryParams: stat.queryParams });
+  }
 
   readonly categoryLabels = computed(() => Array.from(new Set(this.products().map((p) => p.category))));
 

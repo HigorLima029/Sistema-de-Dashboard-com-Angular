@@ -125,6 +125,7 @@ export class RelatoriosComponent {
           Destinatário: m.destino?.recipientName ?? '',
           CPF: m.destino?.cpf ?? '',
           Endereço: m.destino?.address ?? '',
+          IMEIs: m.imeis?.join(', ') ?? '',
         }));
 
     const sufixoPeriodo = this.periodo() === 'hoje' ? 'hoje' : this.periodo() === 'mes' ? 'ultimo-mes' : 'personalizado';

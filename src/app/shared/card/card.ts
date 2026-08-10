@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IconComponent, IconName } from '../icon/icon';
 
 /**
@@ -10,6 +10,9 @@ import { IconComponent, IconName } from '../icon/icon';
  * Modo "painel": passe apenas `title`/`icon` (opcionais) e use o
  * conteúdo projetado (`<ng-content>`) para qualquer coisa — gráfico,
  * lista, tabela etc.
+ *
+ * Passe `clickable` para deixar o card interativo (cursor, hover,
+ * acessível via teclado) e escute `(cardClick)`.
  */
 @Component({
   selector: 'app-card',
@@ -22,4 +25,10 @@ export class CardComponent {
   @Input() title?: string;
   @Input() icon?: IconName;
   @Input() value?: string;
+  @Input() clickable = false;
+  @Output() cardClick = new EventEmitter<void>();
+
+  onActivate(): void {
+    if (this.clickable) this.cardClick.emit();
+  }
 }

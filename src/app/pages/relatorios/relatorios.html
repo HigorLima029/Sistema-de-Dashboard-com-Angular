@@ -99,8 +99,8 @@
     </app-table>
   } @else {
     <app-table
-      [columns]="['Data', 'Produto', 'Qtd.', 'Cliente', 'Destinatário', 'CPF', 'Endereço', '']"
-      gridTemplate="1fr 1.4fr 0.6fr 1fr 1fr 0.9fr 1.5fr 0.5fr"
+      [columns]="['Data', 'Produto', 'Qtd.', 'Cliente', 'Destinatário', 'CPF', 'Endereço', 'IMEIs', '']"
+      gridTemplate="0.9fr 1.2fr 0.5fr 0.9fr 0.9fr 0.8fr 1.3fr 1fr 0.4fr"
       [items]="movimentosFiltrados()"
       emptyMessage="Nenhuma saída registrada nesse período."
     >
@@ -112,6 +112,9 @@
         <span [title]="item.destino?.recipientName">{{ item.destino?.recipientName }}</span>
         <span>{{ item.destino?.cpf }}</span>
         <span [title]="item.destino?.address">{{ item.destino?.address }}</span>
+        <span class="relatorios__imeis" [title]="item.imeis?.join(', ')">
+          {{ item.imeis?.join(', ') ?? '—' }}
+        </span>
         <button
           type="button"
           class="relatorios__edit-btn"

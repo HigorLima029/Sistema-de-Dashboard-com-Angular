@@ -148,6 +148,14 @@
   font-weight: 600;
 }
 
+.relatorios__imeis {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .relatorios__edit-btn {
   display: inline-flex;
   align-items: center;

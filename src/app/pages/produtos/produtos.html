@@ -26,6 +26,13 @@
         <option [value]="category">{{ category }}</option>
       }
     </select>
+
+    @if (filtroEstoqueBaixo()) {
+      <button type="button" class="produtos__filter-chip" (click)="limparFiltroEstoque()">
+        Estoque baixo
+        <app-icon name="close" [size]="12"></app-icon>
+      </button>
+    }
   </div>
 
   <app-table
@@ -179,9 +186,39 @@
   @if (saidaProduct()) {
     <form class="form" [formGroup]="saidaForm" (ngSubmit)="confirmarSaida()">
       <label class="field">
-        <span>Quantidade</span>
-        <input type="number" min="1" formControlName="quantidade" />
+        <span>Quantidade{{ saidaImeis().length > 0 ? ' (definida pelos IMEIs escaneados)' : '' }}</span>
+        <input type="number" min="1" formControlName="quantidade" [readonly]="saidaImeis().length > 0" />
       </label>
+
+      <div class="field">
+        <span>IMEIs (opcional — escaneie ou digite e aperte Enter)</span>
+        <input
+          type="text"
+          inputmode="numeric"
+          placeholder="Escaneie o IMEI e pressione Enter"
+          [ngModel]="imeiInput()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="imeiInput.set($event)"
+          (keydown.enter)="$event.preventDefault(); escanearImei()"
+        />
+        @if (imeiError()) {
+          <span class="field__error">{{ imeiError() }}</span>
+        }
+
+        @if (saidaImeis().length > 0) {
+          <ul class="produtos__imei-list">
+            @for (imei of saidaImeis(); track imei) {
+              <li>
+                <span>{{ imei }}</span>
+                <button type="button" (click)="removerImei(imei)" aria-label="Remover IMEI">
+                  <app-icon name="close" [size]="12"></app-icon>
+                </button>
+              </li>
+            }
+          </ul>
+          <span class="produtos__imei-count">{{ saidaImeis().length }} IMEI(s) escaneado(s)</span>
+        }
+      </div>
 
       <label class="field">
         <span>Destinatário (quem vai receber)</span>

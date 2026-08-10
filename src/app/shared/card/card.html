@@ -1,5 +1,13 @@
 @if (value !== undefined) {
-  <div class="card card--stat">
+  <div
+    class="card card--stat"
+    [class.card--clickable]="clickable"
+    [attr.role]="clickable ? 'button' : null"
+    [attr.tabindex]="clickable ? 0 : null"
+    (click)="onActivate()"
+    (keydown.enter)="onActivate()"
+    (keydown.space)="$event.preventDefault(); onActivate()"
+  >
     @if (icon) {
       <div class="card__icon">
         <app-icon [name]="icon" [size]="20"></app-icon>

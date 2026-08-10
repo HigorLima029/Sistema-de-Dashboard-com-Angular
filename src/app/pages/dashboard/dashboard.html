@@ -17,7 +17,13 @@
       }
     } @else {
       @for (stat of stats(); track stat.label) {
-        <app-card [icon]="stat.icon" [title]="stat.label" [value]="stat.value"></app-card>
+        <app-card
+          [icon]="stat.icon"
+          [title]="stat.label"
+          [value]="stat.value"
+          [clickable]="!!stat.queryParams"
+          (cardClick)="irParaProdutos(stat)"
+        ></app-card>
       }
     }
   </section>

@@ -4,42 +4,38 @@ import {
   ROUTES,
   Router,
   loadChildren
-} from "./chunk-XPERJY6M.js";
+} from "./chunk-XODXADPF.js";
 import {
   BrowserDomAdapter,
   BrowserModule,
   EVENT_MANAGER_PLUGINS,
   EventManagerPlugin
-} from "./chunk-B4GQ6Z3S.js";
+} from "./chunk-3WRSSQGV.js";
+import {
+  HTTP_ROOT_INTERCEPTOR_FNS
+} from "./chunk-EIEJLKLK.js";
 import {
   APP_BASE_HREF,
   NullViewportScroller,
   PLATFORM_SERVER_ID,
   ViewportScroller
-} from "./chunk-SP62ZTBQ.js";
-import {
-  HTTP_ROOT_INTERCEPTOR_FNS
-} from "./chunk-PAIGE2PX.js";
+} from "./chunk-3UKAYOC5.js";
 import {
   PlatformLocation,
   XhrFactory,
   getDOM,
   setRootDomAdapter
-} from "./chunk-DXJCKVWH.js";
+} from "./chunk-KKCQWN6Q.js";
 import {
   APP_ID,
   ApplicationRef,
   CSP_NONCE,
   Compiler,
   Console,
-  DOCUMENT,
   ENABLE_ROOT_COMPONENT_BOOTSTRAP,
-  EnvironmentInjector,
   IS_HYDRATION_DOM_REUSE_ENABLED,
   Inject,
   Injectable,
-  InjectionToken,
-  Injector,
   LOCALE_ID,
   NgModule,
   PLATFORM_ID,
@@ -52,26 +48,32 @@ import {
   TESTABILITY,
   Testability,
   TransferState,
-  Version,
   annotateForHydration,
   createEnvironmentInjector,
   createPlatformFactory,
-  inject,
-  makeEnvironmentProviders,
   platformCore,
-  provideEnvironmentInitializer,
-  require_cjs,
   resetCompiledComponents,
-  runInInjectionContext,
   setClassMetadata,
   setDocument,
   startMeasuring,
   stopMeasuring,
+  ɵɵdefineNgModule
+} from "./chunk-MAZ42MLW.js";
+import {
+  DOCUMENT,
+  EnvironmentInjector,
+  InjectionToken,
+  Injector,
+  Version,
+  inject,
+  makeEnvironmentProviders,
+  provideEnvironmentInitializer,
+  require_cjs,
+  runInInjectionContext,
   ɵɵdefineInjectable,
   ɵɵdefineInjector,
-  ɵɵdefineNgModule,
   ɵɵinject
-} from "./chunk-FAI4WHEZ.js";
+} from "./chunk-4MDR2EJQ.js";
 import {
   __objRest,
   __spreadProps,
@@ -28357,4 +28359,4 @@ export {
   AngularAppEngine,
   createRequestHandler
 };
-//# sourceMappingURL=chunk-AN46PDZE.js.map
+//# sourceMappingURL=chunk-VUIUZR34.js.map

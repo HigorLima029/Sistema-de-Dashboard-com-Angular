@@ -1,6 +1,8 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NewProductInput, Product, ProductsStore } from '../../core/products.store';
 import { StockService } from '../../core/stock.service';
 import { cpfValidator } from '../../core/validators';
@@ -29,7 +31,12 @@ type ProdutoModalMode = 'novo' | 'editar' | null;
 export class ProdutosComponent {
   private readonly productsStore = inject(ProductsStore);
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   readonly stock = inject(StockService);
+
+  private readonly queryParams = toSignal(this.route.queryParamMap, { initialValue: this.route.snapshot.queryParamMap });
+  readonly filtroEstoqueBaixo = computed(() => this.queryParams().get('estoque') === 'baixo');
 
   readonly loading = this.productsStore.loading;
   readonly products = this.productsStore.products;
@@ -37,6 +44,9 @@ export class ProdutosComponent {
   readonly selectedCategory = signal<string>('todas');
   readonly selectedProduct = signal<Product | null>(null);
   readonly saidaProduct = signal<Product | null>(null);
+  readonly saidaImeis = signal<string[]>([]);
+  readonly imeiInput = signal('');
+  readonly imeiError = signal<string | null>(null);
 
   readonly produtoModalMode = signal<ProdutoModalMode>(null);
   readonly editingProductId = signal<number | null>(null);
@@ -52,13 +62,19 @@ export class ProdutosComponent {
   readonly filteredProducts = computed(() => {
     const term = this.search().trim().toLowerCase();
     const category = this.selectedCategory();
+    const apenasBaixo = this.filtroEstoqueBaixo();
 
     return this.products().filter((p) => {
       const matchesCategory = category === 'todas' || p.category === category;
       const matchesSearch = !term || p.title.toLowerCase().includes(term);
-      return matchesCategory && matchesSearch;
+      const matchesEstoque = !apenasBaixo || this.isLowStock(p.id);
+      return matchesCategory && matchesSearch && matchesEstoque;
     });
   });
+
+  limparFiltroEstoque(): void {
+    this.router.navigate([], { queryParams: {} });
+  }
 
   readonly saidaForm = this.fb.nonNullable.group({
     quantidade: [1, [Validators.required, Validators.min(1)]],
@@ -122,11 +138,45 @@ export class ProdutosComponent {
       cliente: '',
       endereco: '',
     });
+    this.saidaImeis.set([]);
+    this.imeiInput.set('');
+    this.imeiError.set(null);
     this.saidaProduct.set(product);
   }
 
   fecharSaida(): void {
     this.saidaProduct.set(null);
+  }
+
+  /** Chamado a cada Enter do leitor de código de barras/QR (ou digitação manual + Enter). */
+  escanearImei(): void {
+    const valor = this.imeiInput().trim();
+    if (!valor) return;
+
+    if (!/^\d{14,17}$/.test(valor)) {
+      this.imeiError.set('IMEI inválido — deve ter só números (14 a 17 dígitos).');
+      return;
+    }
+
+    if (this.saidaImeis().includes(valor)) {
+      this.imeiError.set('Esse IMEI já foi escaneado.');
+      return;
+    }
+
+    const atualizados = [...this.saidaImeis(), valor];
+    this.saidaImeis.set(atualizados);
+    this.saidaForm.patchValue({ quantidade: atualizados.length });
+
+    this.imeiInput.set('');
+    this.imeiError.set(null);
+  }
+
+  removerImei(imei: string): void {
+    const atualizados = this.saidaImeis().filter((item) => item !== imei);
+    this.saidaImeis.set(atualizados);
+    if (atualizados.length > 0) {
+      this.saidaForm.patchValue({ quantidade: atualizados.length });
+    }
   }
 
   confirmarSaida(): void {
@@ -140,12 +190,19 @@ export class ProdutosComponent {
 
     const { quantidade, destinatario, cpf, cliente, endereco } = this.saidaForm.getRawValue();
 
-    this.stock.registrarMovimento(product.id, product.title, 'saida', quantidade, {
-      recipientName: destinatario,
-      cpf,
-      client: cliente,
-      address: endereco,
-    });
+    this.stock.registrarMovimento(
+      product.id,
+      product.title,
+      'saida',
+      quantidade,
+      {
+        recipientName: destinatario,
+        cpf,
+        client: cliente,
+        address: endereco,
+      },
+      this.saidaImeis().length ? this.saidaImeis() : undefined,
+    );
 
     this.fecharSaida();
   }
